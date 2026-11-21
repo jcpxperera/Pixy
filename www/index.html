@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#f4f5f0">
+<title>Pixy</title>
+<style>
+:root{--bg:#f4f5f0;--card:#fbfbf8;--ink:#17201b;--mute:#7c857f;--line:#e4e7e1;--green:#1f6b4e;--sage:#7fa896;--tint:#e6f0e8;--bad:#b3402f}
+@media (prefers-color-scheme:dark){:root{--bg:#121714;--card:#1a211d;--ink:#eef2ee;--mute:#8d9891;--line:#2a332d;--green:#5fbf94;--sage:#6fa58d;--tint:#22302a;--bad:#e0705e}}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:"DM Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;padding:max(16px,env(safe-area-inset-top)) 16px max(24px,env(safe-area-inset-bottom))}
+.wrap{max-width:1000px;margin:0 auto}
+header{display:flex;align-items:baseline;gap:12px;padding:4px 4px 16px}
+header h1{font-size:22px;margin:0;letter-spacing:-.02em}
+header span{color:var(--mute);font-size:14px}
+.grid{display:grid;gap:16px;grid-template-columns:1fr;align-items:start}
+@media(min-width:820px){.grid{grid-template-columns:1fr 1fr}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:28px;overflow:hidden}
+.card h2{display:flex;align-items:center;gap:12px;margin:0;padding:18px 22px;font-size:17px;border-bottom:1px solid var(--line)}
+.n{width:32px;height:32px;border-radius:50%;background:var(--green);color:var(--bg);display:grid;place-items:center;font-size:13px}
+.body{padding:22px}
+.drop{border:1.5px dashed var(--line);border-radius:22px;background:var(--bg);min-height:300px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;cursor:pointer;transition:border-color .15s,background .15s}
+.drop.over{border-color:var(--sage);background:var(--tint)}
+.ico{width:64px;height:64px;border-radius:20px;background:var(--tint);display:grid;place-items:center;margin-bottom:20px;color:var(--green)}
+.drop b{font-size:18px}.drop p{margin:8px 0 18px;color:var(--mute)}
+.pill{border:1px solid var(--line);border-radius:99px;padding:9px 18px;font-size:13px;color:var(--mute);background:var(--card)}
+.files{display:none}
+.files.on{display:block}
+.fhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;font-size:14px;color:var(--mute)}
+.link{background:none;border:0;color:var(--green);font:inherit;font-weight:600;cursor:pointer;padding:6px 0}
+.list{display:grid;gap:8px;max-height:380px;overflow:auto;padding-right:2px}
+.f{display:flex;align-items:center;gap:12px;padding:8px;border:1px solid var(--line);border-radius:16px;background:var(--bg)}
+.f img{width:48px;height:48px;border-radius:10px;object-fit:cover;background:var(--tint)}
+.f div{flex:1;min-width:0;font-size:14px}
+.f div small{display:block;color:var(--mute);margin-top:2px}
+.f .nm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.f .st{font-size:12px;color:var(--green)}.f .st.err{color:var(--bad)}
+.x{border:0;background:none;color:var(--mute);font-size:20px;width:32px;height:32px;cursor:pointer}
+.add{margin-top:12px;width:100%;border:1.5px dashed var(--line);background:none;border-radius:14px;padding:12px;color:var(--green);font:inherit;font-weight:600;cursor:pointer}
+.presets{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.preset{text-align:left;font:inherit;color:var(--ink);background:var(--bg);border:1.5px solid var(--line);border-radius:18px;padding:14px;cursor:pointer}
+.preset small{display:block;color:var(--mute);font-size:12px;margin-top:4px}
+.preset.on{border-color:var(--sage);background:var(--tint)}
+.preset b{font-size:14px}
+label.l{display:block;font-size:13px;color:var(--mute);margin-bottom:8px}
+.dims{display:grid;grid-template-columns:1fr 52px 1fr;gap:10px;align-items:end;margin-top:18px}
+.inp{position:relative}
+.inp input{width:100%;font:inherit;font-size:17px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:16px;padding:16px 40px 16px 16px;outline:none}
+.inp input:focus,select:focus{border-color:var(--sage)}
+.inp i{position:absolute;right:14px;top:50%;transform:translateY(-50%);font-style:normal;font-size:13px;color:var(--mute)}
+.lock{height:54px;border-radius:16px;border:1px solid var(--line);background:var(--bg);color:var(--mute);cursor:pointer;display:grid;place-items:center}
+.lock.on{background:var(--tint);color:var(--green)}
+.hint{font-size:12.5px;color:var(--mute);margin:10px 0 0}
+hr{border:0;border-top:1px solid var(--line);margin:22px 0}
+.fq{display:grid;grid-template-columns:1fr 1.6fr;gap:22px;align-items:end}
+select{width:100%;font:inherit;font-size:16px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:16px;padding:15px;outline:none}
+.qh{display:flex;justify-content:space-between;font-size:13px;color:var(--mute);margin-bottom:8px}
+.qh b{color:var(--green);font-weight:600}
+input[type=range]{width:100%;accent-color:var(--green);height:28px}
+input[type=range]:disabled{opacity:.4}
+.est{display:flex;justify-content:space-between;background:var(--bg);border-radius:16px;padding:16px;margin-top:22px;font-size:14px;color:var(--mute)}
+.est b{color:var(--ink);font-weight:600}
+.go{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;margin-top:18px;padding:18px;border:0;border-radius:22px;background:var(--green);color:var(--bg);font:inherit;font-size:16px;font-weight:700;cursor:pointer}
+.go:disabled{background:var(--sage);opacity:.55;cursor:not-allowed}
+.share{display:flex;align-items:center;justify-content:center;gap:8px;margin:14px auto 0;color:var(--green)}
+.share:disabled{opacity:.5}
+.bar{height:4px;border-radius:4px;background:var(--line);margin-top:14px;overflow:hidden;display:none}
+.bar.on{display:block}.bar div{height:100%;width:0;background:var(--green);transition:width .2s}
+.toast{position:fixed;left:50%;bottom:max(24px,env(safe-area-inset-bottom));transform:translate(-50%,20px);background:var(--ink);color:var(--bg);padding:12px 20px;border-radius:99px;font-size:14px;opacity:0;pointer-events:none;transition:.25s;max-width:90vw;text-align:center}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+:focus-visible{outline:2px solid var(--green);outline-offset:2px}
+@media(max-width:420px){.presets{gap:6px}.preset{padding:12px 10px}.fq{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header><h1>Pixy</h1><span>Resize. Save. Done.</span></header>
+<div class="grid">
+
+<section class="card">
+  <h2><span class="n">1</span>Choose your images</h2>
+  <div class="body">
+    <div class="drop" id="drop" tabindex="0" role="button" aria-label="Choose images">
+      <div class="ico"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V4M7 9l5-5 5 5M4 15v3a2 2 0 002 2h12a2 2 0 002-2v-3"/></svg></div>
+      <b>Drop images here</b>
+      <p>or tap to browse your device</p>
+      <span class="pill">JPG, PNG or WebP · up to 30 MB each</span>
+    </div>
+    <div class="files" id="files">
+      <div class="fhead"><span id="count"></span><button class="link" id="clear">Clear all</button></div>
+      <div class="list" id="list"></div>
+      <button class="add" id="more">+ Add more images</button>
+    </div>
+    <input type="file" id="pick" accept="image/jpeg,image/png,image/webp" multiple hidden>
+  </div>
+</section>
+
+<section class="card">
+  <h2><span class="n">2</span>Set your size</h2>
+  <div class="body">
+    <div class="presets" id="presets">
+      <button class="preset" data-v="1000"><b>Compact</b><small>Max 1000 px</small></button>
+      <button class="preset on" data-v="1500"><b>Recommended</b><small>Max 1500 px</small></button>
+      <button class="preset" data-v="2000"><b>Large</b><small>Max 2000 px</small></button>
+    </div>
+    <div class="dims">
+      <div><label class="l" for="w">Max width</label><div class="inp"><input id="w" type="number" inputmode="numeric" min="16" max="8000" value="1500"><i>px</i></div></div>
+      <button class="lock on" id="lock" aria-label="Keep width and height linked"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path id="shackle" d="M8 11V8a4 4 0 018 0v3"/></svg></button>
+      <div><label class="l" for="h">Max height</label><div class="inp"><input id="h" type="number" inputmode="numeric" min="16" max="8000" value="1500"><i>px</i></div></div>
+    </div>
+    <p class="hint">Images fit inside this size without cropping or stretching. Smaller images are never enlarged.</p>
+    <hr>
+    <div class="fq">
+      <div><label class="l" for="fmt">Format</label><select id="fmt"><option value="image/jpeg">JPG</option><option value="image/png">PNG</option><option value="image/webp">WebP</option></select></div>
+      <div><div class="qh"><label for="q">Quality</label><b id="qv">88%</b></div><input id="q" type="range" min="40" max="100" value="88"></div>
+    </div>
+    <div class="est"><span>Estimated output</span><b id="est">—</b></div>
+    <div class="bar" id="bar"><div></div></div>
+    <button class="go" id="go" disabled><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7 11l5 5 5-5M5 20h14"/></svg><span id="golbl">Resize &amp; download</span></button>
+    <button class="link share" id="share" disabled><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg>Share instead</button>
+  </div>
+</section>
+
+</div>
+</div>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+const $ = id => document.getElementById(id);
+const MAX_BYTES = 30 * 1024 * 1024;
+const EXT = {"image/jpeg":"jpg","image/png":"png","image/webp":"webp"};
+const P = (window.Capacitor && window.Capacitor.Plugins) || {};
+const native = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
+let items = [], busy = false, estTimer;
+
+/* ---------- helpers ---------- */
+const fmtSize = b => b > 1048576 ? (b/1048576).toFixed(1)+" MB" : Math.max(1,Math.round(b/1024))+" KB";
+function toast(msg){const t=$("toast");t.textContent=msg;t.classList.add("on");clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove("on"),2800)}
+const blobToB64 = blob => new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(String(r.result).split(",")[1]);r.onerror=rej;r.readAsDataURL(blob)});
+const clampDim = v => Math.min(8000, Math.max(16, parseInt(v) || 1500));
+
+/* ---------- size controls ---------- */
+let locked = true;
+function syncPresetUI(){
+  document.querySelectorAll(".preset").forEach(b => b.classList.toggle("on", +b.dataset.v === +$("w").value && +b.dataset.v === +$("h").value));
+}
+document.querySelectorAll(".preset").forEach(b => b.onclick = () => { $("w").value = $("h").value = b.dataset.v; syncPresetUI(); queueEst(); });
+$("w").oninput = () => { if (locked) $("h").value = $("w").value; syncPresetUI(); queueEst(); };
+$("h").oninput = () => { if (locked) $("w").value = $("h").value; syncPresetUI(); queueEst(); };
+$("lock").onclick = () => {
+  locked = !locked; $("lock").classList.toggle("on", locked);
+  $("shackle").setAttribute("d", locked ? "M8 11V8a4 4 0 018 0v3" : "M8 11V8a4 4 0 017.5-2");
+  if (locked) $("h").value = $("w").value;
+};
+$("q").oninput = () => { $("qv").textContent = $("q").value + "%"; queueEst(); };
+$("fmt").onchange = () => { $("q").disabled = $("fmt").value === "image/png"; queueEst(); };
+
+/* ---------- file intake ---------- */
+const drop = $("drop"), pick = $("pick");
+drop.onclick = () => pick.click();
+drop.onkeydown = e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); pick.click(); } };
+$("more").onclick = () => pick.click();
+pick.onchange = () => { addFiles(pick.files); pick.value = ""; };
+["dragenter","dragover"].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.add("over"); }));
+["dragleave","drop"].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.remove("over"); }));
+drop.addEventListener("drop", e => addFiles(e.dataTransfer.files));
+$("clear").onclick = () => { items.forEach(i => URL.revokeObjectURL(i.url)); items = []; render(); };
+
+function addFiles(fl){
+  let skipped = 0;
+  for (const f of fl) {
+    if (!EXT[f.type] || f.size > MAX_BYTES) { skipped++; continue; }
+    items.push({ id: Math.random().toString(36).slice(2), file: f, url: URL.createObjectURL(f), status: "" });
+  }
+  if (skipped) toast(skipped + " file" + (skipped > 1 ? "s" : "") + " skipped (use JPG, PNG or WebP under 30 MB)");
+  render();
+}
+function render(){
+  const has = items.length > 0;
+  drop.style.display = has ? "none" : "flex";
+  $("files").classList.toggle("on", has);
+  $("count").textContent = items.length + (items.length === 1 ? " image" : " images");
+  $("list").innerHTML = "";
+  for (const it of items) {
+    const row = document.createElement("div"); row.className = "f";
+    row.innerHTML = '<img alt=""><div><span class="nm"></span><small></small></div><button class="x" aria-label="Remove">×</button>';
+    row.querySelector("img").src = it.url;
+    row.querySelector(".nm").textContent = it.file.name;
+    row.querySelector("small").innerHTML = fmtSize(it.file.size) + (it.status ? ' · <span class="st ' + (it.err ? "err" : "") + '">' + it.status + "</span>" : "");
+    row.querySelector(".x").onclick = () => { URL.revokeObjectURL(it.url); items = items.filter(x => x !== it); render(); };
+    $("list").appendChild(row);
+  }
+  $("go").disabled = $("share").disabled = !has || busy;
+  $("golbl").textContent = items.length > 1 ? "Resize & download all" : "Resize & download";
+  queueEst();
+}
+
+/* ---------- resizing ---------- */
+async function resizeOne(file){
+  const mw = clampDim($("w").value), mh = clampDim($("h").value);
+  const type = $("fmt").value, quality = +$("q").value / 100;
+  const bmp = await createImageBitmap(file, { imageOrientation: "from-image" });
+  const scale = Math.min(1, mw / bmp.width, mh / bmp.height);
+  const w = Math.max(1, Math.round(bmp.width * scale)), h = Math.max(1, Math.round(bmp.height * scale));
+  const c = document.createElement("canvas"); c.width = w; c.height = h;
+  const ctx = c.getContext("2d");
+  ctx.imageSmoothingQuality = "high";
+  if (type === "image/jpeg") { ctx.fillStyle = "#fff"; ctx.fillRect(0, 0, w, h); }
+  ctx.drawImage(bmp, 0, 0, w, h); bmp.close && bmp.close();
+  const blob = await new Promise(r => c.toBlob(r, type, quality));
+  c.width = c.height = 0;
+  if (!blob) throw new Error("Could not encode");
+  return blob;
+}
+function outName(name, used){
+  const base = name.replace(/\.[^.]+$/, "") + "-pixy";
+  const ext = EXT[$("fmt").value]; let n = base + "." + ext, i = 2;
+  while (used.has(n)) n = base + "-" + (i++) + "." + ext;
+  used.add(n); return n;
+}
+
+/* ---------- estimate ---------- */
+function queueEst(){ clearTimeout(estTimer); estTimer = setTimeout(estimate, 350); }
+async function estimate(){
+  if (!items.length || busy) { $("est").textContent = "—"; return; }
+  try {
+    const first = items[0], b = await resizeOne(first.file);
+    const total = items.reduce((s, i) => s + i.file.size, 0);
+    const approx = b.size * (total / first.file.size);
+    $("est").textContent = "~" + fmtSize(Math.min(approx, b.size * items.length * 4)) + " from " + fmtSize(total);
+  } catch { $("est").textContent = "—"; }
+}
+
+/* ---------- output ---------- */
+async function run(mode){
+  if (busy || !items.length) return;
+  busy = true; $("go").disabled = $("share").disabled = true;
+  $("bar").classList.add("on"); const bar = $("bar").firstElementChild; bar.style.width = "0";
+  const used = new Set(), out = [];
+  items.forEach(i => { i.status = ""; i.err = false; });
+  for (let k = 0; k < items.length; k++) {
+    const it = items[k];
+    try {
+      const blob = await resizeOne(it.file);
+      out.push({ name: outName(it.file.name, used), blob });
+      it.status = "Done · " + fmtSize(blob.size);
+    } catch { it.status = "Failed"; it.err = true; }
+    bar.style.width = Math.round((k + 1) / items.length * 100) + "%";
+    render(); await new Promise(r => setTimeout(r));
+  }
+  try { await deliver(out, mode); }
+  catch (e) { if (!/cancel/i.test(String(e && e.message))) toast("Could not save. Try Share instead."); }
+  busy = false; $("bar").classList.remove("on"); $("go").disabled = $("share").disabled = false;
+}
+
+async function deliver(out, mode){
+  if (!out.length) { toast("Nothing was resized"); return; }
+  if (native && P.Filesystem) {
+    if (mode === "save") {
+      try {
+        for (const f of out) await P.Filesystem.writeFile({ path: "Pixy/" + f.name, data: await blobToB64(f.blob), directory: "DOCUMENTS", recursive: true });
+        toast("Saved " + out.length + (out.length > 1 ? " images" : " image") + " to Documents/Pixy"); return;
+      } catch (e) { /* fall through to share sheet */ }
+    }
+    if (P.Share) {
+      const uris = [];
+      for (const f of out) { const r = await P.Filesystem.writeFile({ path: "pixy-out/" + f.name, data: await blobToB64(f.blob), directory: "CACHE", recursive: true }); uris.push(r.uri); }
+      await P.Share.share({ title: "Pixy", files: uris, dialogTitle: "Save or share" });
+      return;
+    }
+  }
+  // Browser / PWA
+  if (mode === "share" && navigator.canShare) {
+    const files = out.map(f => new File([f.blob], f.name, { type: f.blob.type }));
+    if (navigator.canShare({ files })) { await navigator.share({ files }); return; }
+  }
+  for (const f of out) {
+    const a = document.createElement("a"); a.href = URL.createObjectURL(f.blob); a.download = f.name;
+    document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+    await new Promise(r => setTimeout(r, 250));
+  }
+  toast("Done");
+}
+$("go").onclick = () => run("save");
+$("share").onclick = () => run("share");
+render();
+</script>
+</body>
+</html>
